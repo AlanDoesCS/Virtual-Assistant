@@ -30,12 +30,17 @@ class Interface:
         response = self.model.chat(self.messages)
 
         if self.verbose:
+            print("LLM response:")
             pprint(response)
 
         self.messages.append(ChatMessage(role=response.message.role,
                                          content=response.message.content.split("user:", 1)[0]))
 
-        return response.message.content
+        if self.verbose:
+            print("LLM message history:")
+            pprint(self.messages)
+
+        return response.message.content.split("user:", 1)[0]
 
     def quit(self):
         self.model.quit()
