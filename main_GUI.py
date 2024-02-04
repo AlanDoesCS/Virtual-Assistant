@@ -13,16 +13,11 @@ from customthread import CustomThread as cThread
 from customthread import CustomThreadTest
 import tkinter as tk
 import webbrowser
+import llama_index_interface as llama
 import openai
 
-# ------- OpenAI ------- #
-openai.api_key = ""  # no need for an API key
-openai.api_type = "open_ai"
-openai.api_base = "http://localhost:1234/v1"  # point to the local server
-
-# ----- LLM Memory ----- #
-messages = [{"role": "system", "content": "You are a helpful assistant who must answer to any question."}]
-
+# ------- LLM Model ------- #
+model = llama.Interface(verbose=True, temperature=0.9, max_new_tokens=30_000)
 
 # ------ Functions ------ #
 def insert_newlines(string, every=144):
@@ -35,7 +30,7 @@ def insert_newlines(string, every=144):
     return new_str
 
 
-# ------ CTkinter ------ #
+# -------- CTkinter -------- #
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
@@ -44,6 +39,7 @@ root.title("CheapGPT")
 root.geometry("950x700")
 root.resizable(0, 0)  # Don't allow resizing in the x or y direction
 
+# ------ Create Window ------ #
 frame = ctk.CTkFrame(master=root)
 frame.grid(row=0, column=0, padx=10, pady=10)
 
@@ -54,14 +50,8 @@ conversation_frame = ctk.CTkScrollableFrame(master=frame, width=890, height=525)
 conversation_frame.grid(row=3, column=0, padx=10, pady=10, columnspan=3)
 
 
-def get_llm_response(modelname, context, temperature, max_tokens):
-    completion = openai.ChatCompletion.create(
-        model=modelname,  # this field is currently unused
-        messages=context,
-        temperature=temperature,
-        max_tokens=max_tokens
-    )
-    return completion.choices[0].message.content
+def get_llm_output(input, llm):
+    return llm.chat(input)
 
 
 def prompt_via_ui(prompt):
@@ -70,11 +60,9 @@ def prompt_via_ui(prompt):
 
     # Add prompt to history:
     print("You:", prompt)
-    global messages
-    messages.append({"role": "user", "content": prompt})
 
     # Start LLM with prompt on new thread
-    llm_thread = cThread(target=get_llm_response, args=("local-model", messages, 0.9, -1))
+    llm_thread = cThread(target=get_llm_output, args=(prompt, model))
     llm_thread.start()
 
     # Signature
@@ -106,9 +94,6 @@ def prompt_via_ui(prompt):
     new_llm_label = ctk.CTkLabel(master=conversation_frame, text=response, font=("Roboto", 14),
                                  wraplength=700, justify="left", anchor="w")
     new_llm_label.grid(row=int(frame_rows + 1), column=1, pady=5, padx=10, columnspan=2, sticky="W")
-
-    messages.append({"role": "assistant", "content": response})
-
 
 input_frame = ctk.CTkFrame(master=frame, width=800, height=50)
 input_frame.grid(row=4, column=0, padx=0, pady=10, columnspan=3)

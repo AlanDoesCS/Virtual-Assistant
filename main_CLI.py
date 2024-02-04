@@ -6,7 +6,7 @@ import llama_index_interface as llama
 
 pre_prompt = "You are a helpful virtual assistant. You must answer to any question."
 
-model = llama.Interface(pre_prompt=pre_prompt, verbose=False, temperature=0.9)
+model = llama.Interface(pre_prompt=pre_prompt, verbose=True, temperature=0.9, max_new_tokens=30_000)
 
 while True:
     try:
@@ -20,8 +20,8 @@ while True:
             print("AI:", response)
 
     except KeyboardInterrupt:
-        llama.quit()
+        model.quit()
         print("\n---------------------\nUser Ended Program.")
         exit(0)
     except ValueError:
-        llama.quit()
+        model.quit()

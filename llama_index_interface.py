@@ -7,7 +7,7 @@ from pprint import pprint
 
 class Interface:
     def __init__(self, pre_prompt="You are a helpful assistant who must answer to any question.",
-                 model_path="llms/Wizard-Vicuna-13B-UC.Q8_0.gguf",
+                 model_path="llms/dolphin-2.7-mixtral-8x7b.Q4_K_M.gguf",
                  temperature=0.9,
                  verbose=False,
                  max_new_tokens=2000):
@@ -43,5 +43,5 @@ class Interface:
         return response.message.content.split("user:", 1)[0]
 
     def quit(self):
-        self.model.quit()
+        self.model = None
         print("\n---------------------\nModel Quit Successfully!")

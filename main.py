@@ -9,7 +9,7 @@ import pyttsx3
 pre_prompt = "You are a helpful virtual assistant. You must answer to any question."
 recogniser = sr.Recognizer()
 
-model = llama.Interface(pre_prompt=pre_prompt, verbose=False, temperature=0.9)
+model = llama.Interface(model_path="llms/dolphin-2.7-mixtral-8x7b.Q4_K_M.gguf", pre_prompt=pre_prompt, verbose=True, temperature=0.9)
 
 # Prompt user to say something
 print("Say something...")
