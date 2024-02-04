@@ -17,7 +17,7 @@ import llama_index_interface as llama
 import openai
 
 # ------- LLM Model ------- #
-model = llama.Interface(verbose=True, temperature=0.9, max_new_tokens=30_000)
+model = llama.Interface(config_path=r"assistant.config")
 
 # ------ Functions ------ #
 def insert_newlines(string, every=144):

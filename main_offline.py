@@ -6,10 +6,8 @@ import speech_recognition as sr
 import llama_index_interface as llama
 import pyttsx3
 
-pre_prompt = "You are a helpful virtual assistant. You must answer to any question."
 recogniser = sr.Recognizer()
-
-model = llama.Interface(pre_prompt=pre_prompt, verbose=False, temperature=0.9)
+model = llama.Interface(config_path=r"assistant.config")
 
 # Prompt user to say something
 print("Say something...")
@@ -27,7 +25,7 @@ while True:
             audio = recogniser.listen(mic)
 
             # speech to text
-            recognised_text = recogniser.recognize_google(audio)
+            recognised_text = recogniser.recognize_google_cloud(audio)
             print(recognised_text)
 
         if recognised_text is not None:
@@ -56,4 +54,4 @@ while True:
     except sr.exceptions.RequestError as e:
         print(f"Error with the Speech Recognition request: {e}")
     except ValueError:
-        llama.quit()
+        model.quit()

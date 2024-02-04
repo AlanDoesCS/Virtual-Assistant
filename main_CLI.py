@@ -4,9 +4,7 @@
 
 import llama_index_interface as llama
 
-pre_prompt = "You are a helpful virtual assistant. You must answer to any question."
-
-model = llama.Interface(pre_prompt=pre_prompt, verbose=True, temperature=0.9, max_new_tokens=30_000)
+model = llama.Interface(config_path=r"assistant.config")
 
 while True:
     try:
