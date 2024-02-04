@@ -6,6 +6,10 @@ from pprint import pprint
 import configparser
 
 
+def de_hallucinate(rawtext):
+    return rawtext.split("user:", 1)[0].split("system", 1)[0]
+
+
 class Interface:
     def __init__(self, pre_prompt="You are a helpful assistant who must answer to any question.",
                  model_path="llms/dolphin-2.7-mixtral-8x7b.Q4_K_M.gguf",
@@ -32,9 +36,9 @@ class Interface:
 
         pre_prompt = str(config.get('LLM', 'PRE_PROMPT')).replace("\"", "")
         model_path = str(config.get('LLM', 'MODEL_PATH')).replace("\"", "")
-        temperature = float(config.get('LLM', 'TEMPERATURE'))
-        verbose = bool(config.get('LLM', 'VERBOSE'))
-        max_new_tokens = int(config.get('LLM', 'MAX_NEW_TOKENS'))
+        temperature = config.getfloat('LLM', 'TEMPERATURE')
+        verbose = config.getboolean('LLM', 'VERBOSE')
+        max_new_tokens = config.getint('LLM', 'MAX_NEW_TOKENS')
 
         parameters = [pre_prompt, model_path, temperature, verbose, max_new_tokens]
 
@@ -56,7 +60,27 @@ class Interface:
             print("Model Loaded Successfully!")
 
     def chat(self, text):
-        self.messages.append( ChatMessage(role="user", content=text) )
+        self.messages.append(ChatMessage(role="user", content=text))
+
+        response = self.model.chat(self.messages)
+
+        if self.verbose:
+            print("LLM response:")
+            pprint(response)
+
+        filtered_response = response.message.content.split("user:", 1)[0].split("system", 1)[0]
+
+        self.messages.append(ChatMessage(role=response.message.role,
+                                         content=de_hallucinate(response.message.content)))
+
+        if self.verbose:
+            print("LLM message history:")
+            pprint(self.messages)
+
+        return filtered_response
+
+    def chatAsSystem(self, text):
+        self.messages.append(ChatMessage(role="system", content=text))
 
         response = self.model.chat(self.messages)
 
@@ -65,7 +89,7 @@ class Interface:
             pprint(response)
 
         self.messages.append(ChatMessage(role=response.message.role,
-                                         content=response.message.content.split("user:", 1)[0]))
+                                         content=de_hallucinate(response.message.content)))
 
         if self.verbose:
             print("LLM message history:")
