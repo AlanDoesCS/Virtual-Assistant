@@ -3,6 +3,7 @@
 from llama_index.llms import LlamaCPP
 from llama_index.llms.base import ChatMessage
 from pprint import pprint
+import configparser
 
 
 class Interface:
@@ -11,6 +12,36 @@ class Interface:
                  temperature=0.9,
                  verbose=False,
                  max_new_tokens=2000):
+
+        self.model = LlamaCPP(model_path=model_path,
+                              temperature=temperature,
+                              verbose=verbose,
+                              max_new_tokens=max_new_tokens)
+
+        self.messages = [ChatMessage(role="system", content=pre_prompt)]
+
+        self.verbose = verbose
+
+        if verbose:
+            print("Model Loaded Successfully!")
+
+    def __init__(self, config_path=r"assistant.config"):
+
+        config = configparser.ConfigParser()
+        config.read_file(open(config_path))
+
+        pre_prompt = str(config.get('LLM', 'PRE_PROMPT')).replace("\"", "")
+        model_path = str(config.get('LLM', 'MODEL_PATH')).replace("\"", "")
+        temperature = float(config.get('LLM', 'TEMPERATURE'))
+        verbose = bool(config.get('LLM', 'VERBOSE'))
+        max_new_tokens = int(config.get('LLM', 'MAX_NEW_TOKENS'))
+
+        parameters = [pre_prompt, model_path, temperature, verbose, max_new_tokens]
+
+        if verbose:
+            print("Variables:")
+            for var in parameters:
+                print(type(var), str(var))
 
         self.model = LlamaCPP(model_path=model_path,
                               temperature=temperature,
