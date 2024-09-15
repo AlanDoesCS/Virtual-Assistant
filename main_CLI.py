@@ -4,7 +4,7 @@
 
 import llama_index_interface as llama
 
-model = llama.Interface(config_path=r"assistant.config")
+model = llama.Interface()
 
 while True:
     try:

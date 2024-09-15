@@ -4,12 +4,13 @@
 
 import speech_recognition as sr
 import llama_index_interface as llama
-import pyttsx3
+from gtts import gTTS
+import os
 
-pre_prompt = "You are a helpful virtual assistant. You must answer to any question."
+pre_prompt = "You are a helpful virtual assistant. You must answer any question."
 recogniser = sr.Recognizer()
 
-model = llama.Interface(model_path="llms/dolphin-2.7-mixtral-8x7b.Q4_K_M.gguf", pre_prompt=pre_prompt, verbose=True, temperature=0.9)
+model = llama.Interface()
 
 # Prompt user to say something
 print("Say something...")
@@ -37,14 +38,10 @@ while True:
             # Print output to terminal:
             print("AI:", response)
 
-            # Initialise pyttsx3 lib
-            r = pyttsx3.init()
-
-            # Text to speech
-            r.say(response)
-
-            # Wait for the speech to finish before closing the engine
-            r.runAndWait()
+            # Text to speech using gTTS
+            tts = gTTS(text=response, lang='en')
+            tts.save("response.mp3")
+            os.system("start response.mp3")  # Use "afplay" for macOS or "xdg-open" for Linux
 
             said_something = True
 

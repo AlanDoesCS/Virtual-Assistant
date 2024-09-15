@@ -1,14 +1,13 @@
 # 28/01/2024 - LLAMA index interface
 
-from llama_index.llms import LlamaCPP
-from llama_index.llms.base import ChatMessage
+from llama_index.llms.llama_cpp import LlamaCPP
+from llama_index.llms.llama_cpp.base import ChatMessage
 from pprint import pprint
 import configparser
 
 
 def de_hallucinate(rawtext):
     return rawtext.split("user:", 1)[0].split("system", 1)[0]
-
 
 class Interface:
     def __init__(self, pre_prompt="You are a helpful assistant who must answer to any question.",
